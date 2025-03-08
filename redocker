@@ -1,0 +1,5 @@
+#!/bin/bash
+./gradlew app:buildFatJar
+docker compose build backend
+docker compose up -d
+docker compose restart backend

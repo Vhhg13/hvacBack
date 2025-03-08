@@ -1,0 +1,18 @@
+ktor:
+    application:
+        modules:
+            - tk.vhhg.ApplicationKt.module
+    deployment:
+        port: $PORT
+
+
+postgres:
+  url: "$POSTGRES_URL" #"jdbc:postgresql://localhost/default"
+  user: "$POSTGRES_USER"
+  password: "$POSTGRES_PASSWORD"
+jwt:
+  domain: "$JWT_DOMAIN"
+  audience: "$JWT_AUDIENCE"
+  realm: "$JWT_REALM"
+  secret: "$JWT_SECRET"
+  expiration_time: "$JWT_EXPIRATION_TIME_SECONDS"
