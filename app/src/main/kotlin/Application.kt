@@ -1,6 +1,7 @@
 package tk.vhhg
 
 import io.ktor.server.application.*
+import tk.vhhg.auth.configureSecurity
 import tk.vhhg.plugins.configureDatabase
 import tk.vhhg.plugins.configureMonitoring
 import tk.vhhg.plugins.configureSerialization
@@ -14,6 +15,6 @@ fun Application.module() {
     configureSerialization()
     configureSecurity()
     configureMonitoring()
-    configureRouting()
     configureDatabase()
+    configureRouting()
 }

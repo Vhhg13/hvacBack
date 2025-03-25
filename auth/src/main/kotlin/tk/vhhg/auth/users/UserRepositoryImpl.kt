@@ -1,4 +1,4 @@
-package tk.vhhg.users
+package tk.vhhg.auth.users
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
@@ -10,10 +10,10 @@ import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
-import tk.vhhg.model.TokenConfig
-import tk.vhhg.model.TokenPair
-import tk.vhhg.table.RefreshTokens
-import tk.vhhg.table.Users
+import tk.vhhg.auth.model.TokenConfig
+import tk.vhhg.auth.model.TokenPair
+import tk.vhhg.auth.table.RefreshTokens
+import tk.vhhg.auth.table.Users
 import java.time.Instant
 
 class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVerifier) : UserRepository {
@@ -32,8 +32,8 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVer
         }.value
 
         val id = Users.insertAndGetId {
-            it[Users.username] = providedUsername
-            it[Users.passwordHash] = hash
+            it[username] = providedUsername
+            it[passwordHash] = hash
             it[Users.refreshToken] = refreshTokenId
         }
 
@@ -55,7 +55,7 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVer
 
         val oldRefreshTokenId = user[Users.refreshToken].value
         RefreshTokens.update({ RefreshTokens.id eq oldRefreshTokenId }) {
-            it[RefreshTokens.isRevoked] = true
+            it[isRevoked] = true
         }
 
         val refreshToken = getRandomString(127)

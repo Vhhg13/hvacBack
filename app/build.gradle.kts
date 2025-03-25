@@ -38,14 +38,10 @@ dependencies {
     testImplementation(libs.ktor.client.content.negotiation)
 
     implementation(libs.ktor.koin)
-    implementation(libs.bcrypt)
     implementation("io.insert-koin:koin-ktor:4.0.2")
-    implementation("at.favre.lib:bcrypt:0.10.2")
 
     implementation(project(":auth"))
-
-
-    testImplementation("io.ktor:ktor-client-content-negotiation:2.3.13")
+    implementation(project(":imitation-model"))
 }
 kotlin {
     jvmToolchain(23)

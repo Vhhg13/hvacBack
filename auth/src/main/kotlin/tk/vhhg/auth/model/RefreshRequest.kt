@@ -1,4 +1,4 @@
-package tk.vhhg.model
+package tk.vhhg.auth.model
 
 import kotlinx.serialization.Serializable
 

@@ -2,11 +2,15 @@ package tk.vhhg
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import org.koin.core.qualifier.Qualifier
+import org.koin.core.qualifier.QualifierValue
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
-import tk.vhhg.model.TokenConfig
-import tk.vhhg.users.UserRepository
-import tk.vhhg.users.UserRepositoryImpl
+import tk.vhhg.auth.authModule
+import tk.vhhg.auth.model.TokenConfig
+import tk.vhhg.auth.users.UserRepository
+import tk.vhhg.auth.users.UserRepositoryImpl
 
 fun Application.configureDI() {
     val appModule = module {
@@ -24,6 +28,8 @@ fun Application.configureDI() {
         }
 
         single<UserRepository> { UserRepositoryImpl(get(), get()) }
+
+        single(qualifier("broker")) { environment.config.property("broker").getString() }
     }
     install(Koin) {
         modules(authModule, appModule)

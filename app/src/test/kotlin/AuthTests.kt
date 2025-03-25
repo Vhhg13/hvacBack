@@ -7,8 +7,8 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.testing.*
-import tk.vhhg.model.AuthRequest
-import tk.vhhg.model.TokenPair
+import tk.vhhg.auth.model.AuthRequest
+import tk.vhhg.auth.model.TokenPair
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals

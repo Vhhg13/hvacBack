@@ -16,3 +16,4 @@ jwt:
   realm: "$JWT_REALM"
   secret: "$JWT_SECRET"
   expiration_time: "$JWT_EXPIRATION_TIME_SECONDS"
+broker: "$BROKER"

@@ -1,4 +1,4 @@
-package tk.vhhg.table
+package tk.vhhg.auth.table
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 

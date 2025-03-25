@@ -1,23 +1,19 @@
-package tk.vhhg
+package tk.vhhg.auth
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
-import io.ktor.server.logging.toLogString
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.Route
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import org.koin.ktor.ext.inject
-import tk.vhhg.model.AuthRequest
-import tk.vhhg.model.RefreshRequest
-import tk.vhhg.users.UserRepository
+import tk.vhhg.auth.model.AuthRequest
+import tk.vhhg.auth.model.RefreshRequest
+import tk.vhhg.auth.users.UserRepository
 
 
 fun Routing.authRoutes() {

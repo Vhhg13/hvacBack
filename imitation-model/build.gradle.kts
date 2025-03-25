@@ -1,5 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
+    java
     id("com.github.johnrengelman.shadow") version "8.1.1"
     alias(libs.plugins.kotlin.plugin.serialization)
 }
@@ -7,21 +8,19 @@ plugins {
 group = "tk.vhhg"
 version = "unspecified"
 
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation(libs.paho)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.ktor.server.core)
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
+    implementation(libs.postgresql)
     implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.koin)
-    implementation(libs.bcrypt)
-    implementation(libs.ktor.server.auth.jwt)
-
     testImplementation(kotlin("test"))
-
 }
 
 tasks.test {

@@ -7,6 +7,9 @@ logback-version = "1.4.14"
 postgres-version = "42.7.5"
 koin-version = "4.0.2"
 bcrypt-version = "0.10.2"
+paho = "1.2.5"
+result-monad = "2.0.1"
+kotlin-coroutines = "1.10.1"
 
 [libraries]
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
@@ -27,6 +30,10 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host", version.ref 
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
 ktor-koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
 bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt-version" }
+paho = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho" }
+result-monad = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result-monad" }
+result-monad-coroutines = { module = "com.michael-bull.kotlin-result:kotlin-result-coroutines", version.ref = "result-monad" }
+kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

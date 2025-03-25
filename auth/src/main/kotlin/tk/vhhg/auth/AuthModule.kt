@@ -1,9 +1,9 @@
-package tk.vhhg
+package tk.vhhg.auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import org.koin.dsl.module
-import tk.vhhg.model.TokenConfig
+import tk.vhhg.auth.model.TokenConfig
 
 val authModule = module {
     single {

@@ -4,8 +4,8 @@ import io.ktor.server.application.Application
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import tk.vhhg.table.RefreshTokens
-import tk.vhhg.table.Users
+import tk.vhhg.auth.table.RefreshTokens
+import tk.vhhg.auth.table.Users
 
 fun Application.configureDatabase() {
     val db = Database.connect(

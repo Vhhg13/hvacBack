@@ -1,6 +1,6 @@
-package tk.vhhg.users
+package tk.vhhg.auth.users
 
-import tk.vhhg.model.TokenPair
+import tk.vhhg.auth.model.TokenPair
 
 interface UserRepository {
     suspend fun register(username: String, password: String): TokenPair?
