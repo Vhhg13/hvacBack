@@ -2,11 +2,13 @@ package tk.vhhg.auth.users
 
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.JWTVerificationException
-import com.auth0.jwt.interfaces.DecodedJWT
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
@@ -15,8 +17,9 @@ import tk.vhhg.auth.model.TokenPair
 import tk.vhhg.auth.table.RefreshTokens
 import tk.vhhg.auth.table.Users
 import java.time.Instant
+import java.util.*
 
-class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVerifier) : UserRepository {
+class UserRepositoryImpl(val tokenConfig: TokenConfig) : UserRepository {
 
 
     override suspend fun register(providedUsername: String, password: String): TokenPair? = dbQuery {
@@ -31,7 +34,7 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVer
             it[value] = refreshToken
         }.value
 
-        val id = Users.insertAndGetId {
+        Users.insert {
             it[username] = providedUsername
             it[passwordHash] = hash
             it[Users.refreshToken] = refreshTokenId
@@ -71,15 +74,10 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig, val tokenVerifier: JWTVer
     }
 
     override suspend fun refresh(accessToken: String, refreshToken: String): TokenPair? = dbQuery {
-        val decodedAccessToken: DecodedJWT
-        try {
-            decodedAccessToken = tokenVerifier.verify(accessToken)
-        } catch (e: JWTVerificationException) {
-            return@dbQuery null
-        }
-        val username = decodedAccessToken.subject
-
-        val refreshIdInToken = decodedAccessToken.getClaim("refresh").asInt()
+        val payload = String(Base64.getDecoder().decode(accessToken.substringAfter('.').substringBefore('.')))
+        val decodedJwt = Json.decodeFromString<JsonObject>(payload)
+        val username = decodedJwt["sub"]!!.jsonPrimitive.content
+        val refreshIdInToken = decodedJwt["refresh"]?.jsonPrimitive?.int
 
         val refreshRow = RefreshTokens
             .select(RefreshTokens.id, RefreshTokens.isRevoked)

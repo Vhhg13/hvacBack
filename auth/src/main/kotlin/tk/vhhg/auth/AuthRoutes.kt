@@ -31,6 +31,10 @@ fun Routing.authRoutes() {
             return@post
         }
         val (username, password) = req
+        if (username.isEmpty() || password.isEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, "Empty credentials")
+            return@post
+        }
 
         val tokenPair = usersRepository.register(username, password)
         if (tokenPair == null) {

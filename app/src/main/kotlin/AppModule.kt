@@ -2,8 +2,6 @@ package tk.vhhg
 
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import org.koin.core.qualifier.Qualifier
-import org.koin.core.qualifier.QualifierValue
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
@@ -27,7 +25,7 @@ fun Application.configureDI() {
             )
         }
 
-        single<UserRepository> { UserRepositoryImpl(get(), get()) }
+        single<UserRepository> { UserRepositoryImpl(get()) }
 
         single(qualifier("broker")) { environment.config.property("broker").getString() }
     }
