@@ -10,18 +10,23 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.koin.ktor.ext.inject
 import tk.vhhg.auth.model.AuthRequest
 import tk.vhhg.auth.model.RefreshRequest
 import tk.vhhg.auth.users.UserRepository
+import tk.vhhg.table.Users
 
 
 fun Routing.authRoutes() {
     val usersRepository by inject<UserRepository>()
     authenticate {
         get("/auth") {
-            val user = call.principal<JWTPrincipal>()?.subject
-            call.respond("$user")
+            val userId = call.principal<JWTPrincipal>()?.subject?.toInt()
+            val username = newSuspendedTransaction {
+                Users.select(Users.username).where { Users.id eq userId }.singleOrNull()?.get(Users.username)
+            }
+            call.respond("$username")
         }
     }
     post("/register") {

@@ -8,7 +8,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.update
@@ -34,13 +33,13 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig) : UserRepository {
             it[value] = refreshToken
         }.value
 
-        Users.insert {
+        val userId = Users.insertAndGetId {
             it[username] = providedUsername
             it[passwordHash] = hash
             it[Users.refreshToken] = refreshTokenId
-        }
+        }.value
 
-        val pair = createTokenPair(providedUsername, refreshTokenId, refreshToken)
+        val pair = createTokenPair(userId, refreshTokenId, refreshToken)
         return@dbQuery pair
     }
 
@@ -70,13 +69,13 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig) : UserRepository {
             it[Users.refreshToken] = refreshTokenId
         }
 
-        createTokenPair(providedUsername, refreshTokenId, refreshToken)
+        createTokenPair(user[Users.id].value, refreshTokenId, refreshToken)
     }
 
     override suspend fun refresh(accessToken: String, refreshToken: String): TokenPair? = dbQuery {
         val payload = String(Base64.getDecoder().decode(accessToken.substringAfter('.').substringBefore('.')))
         val decodedJwt = Json.decodeFromString<JsonObject>(payload)
-        val username = decodedJwt["sub"]!!.jsonPrimitive.content
+        val userId = decodedJwt["sub"]!!.jsonPrimitive.int
         val refreshIdInToken = decodedJwt["refresh"]?.jsonPrimitive?.int
 
         val refreshRow = RefreshTokens
@@ -99,20 +98,20 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig) : UserRepository {
         RefreshTokens.update({ RefreshTokens.id eq refreshIdInDb }) {
             it[RefreshTokens.isRevoked] = true
         }
-        Users.update({ Users.username eq username }) {
+        Users.update({ Users.id eq userId }) {
             it[Users.refreshToken] = refreshTokenId
         }
-        createTokenPair(username, refreshTokenId, refreshToken)
+        createTokenPair(userId, refreshTokenId, refreshToken)
     }
 
     private suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    private fun createTokenPair(username: String, refreshId: Int, refresh: String): TokenPair {
+    private fun createTokenPair(userId: Int, refreshId: Int, refresh: String): TokenPair {
         val access = JWT.create()
             .withAudience(tokenConfig.jwtAudience)
             .withIssuer(tokenConfig.jwtDomain)
             .withExpiresAt(Instant.now().plusSeconds(tokenConfig.jwtExpirationTimeSeconds))
-            .withSubject(username)
+            .withSubject(userId.toString())
             .withClaim("refresh", refreshId)
             .sign(Algorithm.HMAC256(tokenConfig.jwtSecret))
         return TokenPair(access, refresh)
