@@ -1,12 +1,10 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 group = "tk.vhhg"
 version = "unspecified"
-
 
 repositories {
     mavenCentral()
@@ -15,15 +13,8 @@ repositories {
 dependencies {
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.koin)
-    implementation(libs.bcrypt)
-    implementation(libs.ktor.server.auth.jwt)
-
-    implementation(project(":tables"))
-
+    implementation(libs.postgresql)
     testImplementation(kotlin("test"))
-
 }
 
 tasks.test {

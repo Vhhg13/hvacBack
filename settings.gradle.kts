@@ -6,3 +6,4 @@ rootProject.name = "hvac"
 include(":app")
 include(":auth")
 include("imitation-model")
+include("tables")

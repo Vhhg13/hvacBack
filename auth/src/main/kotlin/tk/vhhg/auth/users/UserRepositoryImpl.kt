@@ -14,8 +14,8 @@ import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransacti
 import org.jetbrains.exposed.sql.update
 import tk.vhhg.auth.model.TokenConfig
 import tk.vhhg.auth.model.TokenPair
-import tk.vhhg.auth.table.RefreshTokens
-import tk.vhhg.auth.table.Users
+import tk.vhhg.table.RefreshTokens
+import tk.vhhg.table.Users
 import java.time.Instant
 import java.util.*
 

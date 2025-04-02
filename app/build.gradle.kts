@@ -41,6 +41,7 @@ dependencies {
     implementation("io.insert-koin:koin-ktor:4.0.2")
 
     implementation(project(":auth"))
+    implementation(project(":tables"))
     implementation(project(":imitation-model"))
 }
 kotlin {
