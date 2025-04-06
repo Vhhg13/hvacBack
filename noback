@@ -1,1 +1,2 @@
-alias noback="docker compose up -d && docker compose down backend"
+#!/bin/bash
+docker compose up -d && docker compose down backend
