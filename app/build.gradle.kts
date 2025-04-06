@@ -36,12 +36,17 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.content.negotiation)
+    testImplementation(kotlin("test"))
+    testImplementation("ch.qos.logback:logback-classic:1.5.18")
+    testImplementation(libs.ktor.serialization.kotlinx.json)
+    testImplementation("io.ktor:ktor-client-logging:2.3.13")
 
     implementation(libs.ktor.koin)
     implementation("io.insert-koin:koin-ktor:4.0.2")
 
     implementation(project(":auth"))
     implementation(project(":tables"))
+    implementation(project(":rooms"))
     implementation(project(":imitation-model"))
 }
 kotlin {

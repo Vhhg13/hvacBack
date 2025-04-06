@@ -9,6 +9,7 @@ import tk.vhhg.auth.authModule
 import tk.vhhg.auth.model.TokenConfig
 import tk.vhhg.auth.users.UserRepository
 import tk.vhhg.auth.users.UserRepositoryImpl
+import tk.vhhg.rooms.roomsModule
 
 fun Application.configureDI() {
     val appModule = module {
@@ -30,6 +31,6 @@ fun Application.configureDI() {
         single(qualifier("broker")) { environment.config.property("broker").getString() }
     }
     install(Koin) {
-        modules(authModule, appModule)
+        modules(authModule, roomsModule, appModule)
     }
 }

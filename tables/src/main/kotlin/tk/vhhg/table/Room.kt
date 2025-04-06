@@ -7,4 +7,5 @@ object Room : LongIdTable("room") {
     val name = varchar("name", 255)
     val scriptCode = text("script_code")
     val volume = float("volume")
+    val color = varchar("color", 9)
 }
