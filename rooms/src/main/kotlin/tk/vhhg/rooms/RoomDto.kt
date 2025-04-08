@@ -8,5 +8,8 @@ data class RoomDto(
     val color: String,
     val name: String,
     val volume: Float,
-    val scriptCode: String
+    val scriptCode: String,
+    val devices: List<DeviceDto> = emptyList(),
+    val deadline: Long? = null,
+    val target: Float? = null
 )

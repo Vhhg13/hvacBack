@@ -23,6 +23,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import tk.vhhg.rooms.RoomDto
+import tk.vhhg.rooms.TemperatureRegime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -111,6 +112,95 @@ class RoomTests {
             assertEquals(HttpStatusCode.OK, status)
             val body = body<RoomDto>()
             assertEquals(exampleRoom.copy(id = generatedId, scriptCode = "123"), body)
+            assertEquals(null, body.target)
+            assertEquals(null, body.deadline)
+        }
+
+        client.patch("rooms") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody(exampleRoom.copy(id = generatedId, scriptCode = "123", name = exampleRoom.name.repeat(2)))
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        client.get("rooms/$generatedId") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val body = body<RoomDto>()
+            assertEquals(exampleRoom.copy(id = generatedId, scriptCode = "123", name = exampleRoom.name.repeat(2)), body)
+            assertEquals(null, body.target)
+            assertEquals(null, body.deadline)
+        }
+
+        client.patch("rooms") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody(exampleRoom.copy(id = generatedId, scriptCode = "123", name = exampleRoom.name))
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        val exampleTemperatureRegime = TemperatureRegime(
+            target = 18F,
+            deadline = 123L
+        )
+
+        client.post("rooms/-1/temperature") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody(exampleTemperatureRegime)
+        }.apply {
+            assertEquals(HttpStatusCode.NotFound, status)
+        }
+
+
+
+        client.post("rooms/$generatedId/temperature") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody(exampleTemperatureRegime)
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        client.get("rooms/$generatedId") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val body = body<RoomDto>()
+            assertEquals(exampleRoom.copy(
+                id = generatedId,
+                scriptCode = "123",
+                target = exampleTemperatureRegime.target,
+                deadline = exampleTemperatureRegime.deadline
+            ), body)
+        }
+
+        client.get("rooms/-1") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.apply {
+            assertEquals(HttpStatusCode.NotFound, status)
+        }
+
+        client.post("rooms/$generatedId/temperature") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+            contentType(ContentType.Application.Json)
+            setBody(TemperatureRegime(
+                target = null, deadline = null
+            ))
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        client.get("rooms/$generatedId") {
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val body = body<RoomDto>()
+            assertEquals(null, body.deadline)
+            assertEquals(null, body.target)
         }
 
         client.delete("rooms/$generatedId") {

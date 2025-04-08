@@ -4,6 +4,7 @@ import io.ktor.server.application.Application
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import tk.vhhg.table.Device
 import tk.vhhg.table.RefreshTokens
 import tk.vhhg.table.Room
 import tk.vhhg.table.Users
@@ -16,6 +17,6 @@ fun Application.configureDatabase() {
         password = environment.config.property("postgres.password").getString(),
     )
     transaction(db) {
-        SchemaUtils.create(Users, RefreshTokens, Room)
+        SchemaUtils.create(Users, RefreshTokens, Room, Device)
     }
 }

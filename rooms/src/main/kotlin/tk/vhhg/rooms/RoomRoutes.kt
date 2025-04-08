@@ -1,17 +1,13 @@
 package tk.vhhg.rooms
 
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
-import io.ktor.server.request.receiveNullable
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.patch
-import io.ktor.server.routing.post
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import kotlinx.serialization.json.JsonObject
 import org.koin.ktor.ext.inject
 
 fun Route.roomRoutes() {
@@ -20,7 +16,27 @@ fun Route.roomRoutes() {
     fun ApplicationCall.getUserId() = principal<JWTPrincipal>()?.subject?.toInt()
 
     post("rooms/{id}/temperature") {
-        TODO("Later")
+        val userId = call.getUserId()
+        if (userId == null) {
+            call.respond(HttpStatusCode.Unauthorized, "User not found")
+            return@post
+        }
+        val body = call.receiveNullable<TemperatureRegime>()
+        if (body == null) {
+            call.respond(HttpStatusCode.BadRequest, "Malformed request")
+            return@post
+        }
+        val roomId = call.parameters["id"]?.toLong()
+        if (roomId == null) {
+            call.respond(HttpStatusCode.NotFound, "No id provided")
+            return@post
+        }
+        val success = roomRepo.setTemperatureRegime(userId, roomId, body.target, body.deadline)
+        if (success) {
+            call.respond(HttpStatusCode.OK)
+        } else {
+            call.respond(HttpStatusCode.NotFound, "Room not found by id")
+        }
     }
     delete("rooms/{id}") {
         val userId = call.getUserId()
@@ -60,12 +76,12 @@ fun Route.roomRoutes() {
             call.respond(HttpStatusCode.Unauthorized, "No userId provided")
             return@patch
         }
-        val room = call.receiveNullable<RoomDto>()
-        if (room == null) {
+        val patch = call.receiveNullable<JsonObject>()
+        if (patch == null) {
             call.respond(HttpStatusCode.BadRequest, "Malformed room")
             return@patch
         }
-        val success = roomRepo.patchRoom(userId, room)
+        val success = roomRepo.patchRoom(userId, patch)
         if (success) {
             call.respond(HttpStatusCode.OK)
         } else {

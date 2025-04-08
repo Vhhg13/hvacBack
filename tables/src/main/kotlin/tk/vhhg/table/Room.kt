@@ -8,4 +8,6 @@ object Room : LongIdTable("room") {
     val scriptCode = text("script_code")
     val volume = float("volume")
     val color = varchar("color", 9)
+    val targetTemp = float("target_temp").nullable()
+    val deadline = long("deadline").nullable()
 }
