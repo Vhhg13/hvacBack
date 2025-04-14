@@ -18,7 +18,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
 
 fun Route.imitationRoutes(brokerUrl: String) {
-    val imitator = Imitator(brokerUrl)
+    val imitator = Imitator(brokerUrl, 1000)
 
     transaction {
         SchemaUtils.create(ImitatedRoom)

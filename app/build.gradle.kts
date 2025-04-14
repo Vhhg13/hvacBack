@@ -40,6 +40,7 @@ dependencies {
     testImplementation("ch.qos.logback:logback-classic:1.5.18")
     testImplementation(libs.ktor.serialization.kotlinx.json)
     testImplementation("io.ktor:ktor-client-logging:2.3.13")
+    testImplementation(libs.paho)
 
     implementation(libs.ktor.koin)
     implementation("io.insert-koin:koin-ktor:4.0.2")
@@ -48,6 +49,7 @@ dependencies {
     implementation(project(":tables"))
     implementation(project(":rooms"))
     implementation(project(":imitation-model"))
+    implementation(project(":autocontrol"))
 }
 kotlin {
     jvmToolchain(23)

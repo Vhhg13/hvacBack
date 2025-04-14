@@ -36,6 +36,8 @@ class AuthTests {
             tokenPairThatWillBeInvalidated = body()
         }
 
+        // Другие тесты в том же файле...
+
 
         // 2. test register with existing username
         client.post("/register") {

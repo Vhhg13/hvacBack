@@ -7,19 +7,20 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.*;
 
-class Imitator {
+public class Imitator {
     private final ScheduledExecutorService executorService =
             Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
 
     private final String brokerUrl;
 
-    private static final long IMITATION_DELAY = 1000;
+    private final long imitationDelay;
     private static final Random random = new Random();
 
     private final Map<Integer, ImitationTask> tasks = new HashMap<>();
     private final Map<Integer, ScheduledFuture<?>> futures = new HashMap<>();
 
-    public Imitator(String brokerUrl) {
+    public Imitator(String brokerUrl, long imitationDelay) {
+        this.imitationDelay = imitationDelay;
         this.brokerUrl = brokerUrl;
     }
 
@@ -32,7 +33,7 @@ class Imitator {
             ScheduledFuture<?> future = executorService.scheduleAtFixedRate(
                     task,
                     random.nextInt(0, 2000),
-                    IMITATION_DELAY,
+                    this.imitationDelay,
                     TimeUnit.MILLISECONDS
             );
             // TODO: Maybe switch to ConcurrentHashMap, or use a lock idk

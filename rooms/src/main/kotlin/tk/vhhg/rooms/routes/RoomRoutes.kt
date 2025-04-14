@@ -1,4 +1,4 @@
-package tk.vhhg.rooms
+package tk.vhhg.rooms.routes
 
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -9,6 +9,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.JsonObject
 import org.koin.ktor.ext.inject
+import tk.vhhg.rooms.model.RoomDto
+import tk.vhhg.rooms.repo.RoomsRepository
+import tk.vhhg.rooms.model.TemperatureRegime
 
 fun Route.roomRoutes() {
     val roomRepo by inject<RoomsRepository>()
@@ -32,11 +35,16 @@ fun Route.roomRoutes() {
             return@post
         }
         val success = roomRepo.setTemperatureRegime(userId, roomId, body.target, body.deadline)
-        if (success) {
-            call.respond(HttpStatusCode.OK)
-        } else {
-            call.respond(HttpStatusCode.NotFound, "Room not found by id")
+        when (success) {
+            true -> call.respond(HttpStatusCode.OK)
+            false -> call.respond(HttpStatusCode.NotFound, "Room not found by id")
+            null -> call.respond(HttpStatusCode.Conflict, "No thermostat in room")
         }
+//        if (success) {
+//            call.respond(HttpStatusCode.OK)
+//        } else {
+//            call.respond(HttpStatusCode.NotFound, "Room not found by id")
+//        }
     }
     delete("rooms/{id}") {
         val userId = call.getUserId()

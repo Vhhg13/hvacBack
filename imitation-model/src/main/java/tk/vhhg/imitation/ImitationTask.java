@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class ImitationTask implements Runnable {
 
     private static final int HEAT_CAPACITY = 1000;
-    private static final int DENSITY = 1000;
+    private static final float DENSITY = 1.2F;
 
     record Params(int id, String heaters, String coolers, float k, float out, float volume, String thermostat) {}
 
@@ -72,16 +72,17 @@ class ImitationTask implements Runnable {
         float temp,  newTemp;
         temp = Float.intBitsToFloat(temperature.get());
         newTemp = temp + (heating - cooling) / (HEAT_CAPACITY * DENSITY * params.volume) - params.k * (temp - params.out);
-        System.out.println(temp + " " + heating + " " + cooling);
+//        System.out.println(temp + " " + heating + " " + cooling);
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         temperature.set(Float.floatToIntBits(newTemp));
-        System.out.println("set");
+//        System.out.println("set");
         try {
             client.publish(params.thermostat, String.valueOf(newTemp).getBytes(), 2, true);
+            System.out.println("Published " + newTemp + " to " + params.thermostat);
         } catch (MqttException e) {
             throw new RuntimeException(e);
         }

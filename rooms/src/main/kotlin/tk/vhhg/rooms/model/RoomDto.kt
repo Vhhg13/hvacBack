@@ -1,4 +1,4 @@
-package tk.vhhg.rooms
+package tk.vhhg.rooms.model
 
 import kotlinx.serialization.Serializable
 

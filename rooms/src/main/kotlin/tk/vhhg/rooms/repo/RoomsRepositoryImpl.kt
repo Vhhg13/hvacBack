@@ -1,23 +1,26 @@
-package tk.vhhg.rooms
+package tk.vhhg.rooms.repo
 
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.float
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.update
+import tk.vhhg.autocontrol.heatcool.HeatCoolDevice
+import tk.vhhg.autocontrol.heatcool.HeaterCooler
+import tk.vhhg.rooms.model.DeviceDto
+import tk.vhhg.rooms.model.RoomDto
 import tk.vhhg.table.Device
 import tk.vhhg.table.Room
 import tk.vhhg.table.Users
 
-class RoomsRepositoryImpl : RoomsRepository {
+class RoomsRepositoryImpl(
+//    private val scriptExecutor: ScriptExecutor,
+    private val heaterCooler: HeaterCooler
+) : RoomsRepository {
 
     override suspend fun getRoomsForUser(userId: Int): List<RoomDto> = dbQuery {
         Room.selectAll().where { Room.ownerId eq userId }.map { room ->
@@ -32,44 +35,51 @@ class RoomsRepositoryImpl : RoomsRepository {
             it[name] = room.name
             it[color] = room.color
             it[volume] = room.volume
-            it[scriptCode] = room.scriptCode
+            it[scriptCode] = ""
         }.value
+//        scriptExecutor.updateScript(roomId, "")
         roomId
     }
 
     override suspend fun deleteRoom(userId: Int, roomId: Long): Boolean = dbQuery {
         if (!userExists(userId)) return@dbQuery false
+        //scriptExecutor.remove(roomId)
         Room.deleteWhere { id eq roomId } == 1
     }
 
     override suspend fun patchRoom(userId: Int, patch: JsonObject): Boolean = dbQuery {
         if (!userExists(userId)) return@dbQuery false
         val roomId = patch["id"]?.jsonPrimitive?.long
+        println(patch)
         val rowsAffected = Room.update({ (Room.ownerId eq userId) and (Room.id eq roomId) }) { row ->
             patch["name"]?.let { row[name] = it.jsonPrimitive.content }
             patch["color"]?.let { row[color] = it.jsonPrimitive.content }
             patch["volume"]?.let { row[volume] = it.jsonPrimitive.float }
             patch["scriptCode"]?.let { row[scriptCode] = it.jsonPrimitive.content }
         }
+//        patch["scriptCode"]?.let {
+//            if (roomId != null) scriptExecutor.updateScript(roomId, it.jsonPrimitive.content)
+//        }
         rowsAffected == 1
     }
 
     override suspend fun getRoomById(userId: Int, roomId: Long): RoomDto? = dbQuery {
         if (!userExists(userId)) return@dbQuery null
-        val devices = Device.select(Device.id, Device.name, Device.type, Device.topic).where { Device.roomId eq roomId }.map {
-            DeviceDto(
-                id = it[Device.id].value,
-                name = it[Device.name],
-                type = it[Device.type],
-                topic = it[Device.topic],
-                roomId = roomId,
-                historicData = null
-            )
-        }
+        val devices = Device.select(Device.id, Device.name, Device.type, Device.topic, Device.maxPower)
+            .where { (Device.roomId eq roomId) and (Device.ownerId eq userId) }.orderBy(Device.id).map {
+                DeviceDto(
+                    id = it[Device.id].value,
+                    name = it[Device.name],
+                    type = it[Device.type],
+                    topic = it[Device.topic],
+                    roomId = roomId,
+                    historicData = null,
+                    maxPower = it[Device.maxPower]
+                )
+            }
         Room.selectAll().where { (Room.ownerId eq userId) and (Room.id eq roomId) }
             .singleOrNull()
-            //?.toRoomDto(listOf(DeviceDto(id = 123, name = "Термокружка", type = "temp", roomId = roomId, topic = "", historicData = null)) + devices)
-            ?.toRoomDto()
+            ?.toRoomDto(devices)
     }
 
     override suspend fun setTemperatureRegime(
@@ -77,14 +87,34 @@ class RoomsRepositoryImpl : RoomsRepository {
         roomId: Long,
         target: Float?,
         deadline: Long?
-    ): Boolean = dbQuery {
+    ): Boolean? = dbQuery {
         if (!userExists(userId)) return@dbQuery false
+        Room.select(Room.ownerId).where { (Room.id eq roomId) and (Room.ownerId eq userId) }.singleOrNull() ?: return@dbQuery false
         val count = Room.update({
             (Room.id eq roomId) and (Room.ownerId eq userId)
         }) {
-            it[Room.targetTemp] = target
+            it[targetTemp] = target
             it[Room.deadline] = deadline
         }
+        val devices = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
+            .select(Device.topic, Device.maxPower, Device.type, Device.ownerId)
+            .where { (Room.id eq roomId) and (Device.id.isNotNull()) }
+            .orderBy(Device.type to SortOrder.DESC_NULLS_LAST, Device.id to SortOrder.ASC_NULLS_LAST)
+            .map {
+                HeatCoolDevice(
+                    topic = it[Device.topic],
+                    type = it[Device.type],
+                    maxPower = it[Device.maxPower].toDouble()
+                )
+            }
+        heaterCooler.start(
+            roomId = roomId,
+            volume = TODO(),
+            target = target,
+            deadline = deadline,
+            devices = devices
+        )
+
         count == 1
     }
 

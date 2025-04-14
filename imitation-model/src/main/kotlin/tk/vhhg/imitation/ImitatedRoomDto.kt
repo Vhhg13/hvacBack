@@ -3,7 +3,7 @@ package tk.vhhg.imitation
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ImitatedRoomDto(
+data class ImitatedRoomDto(
     val id: Int,
     val heaters: String,
     val coolers: String,

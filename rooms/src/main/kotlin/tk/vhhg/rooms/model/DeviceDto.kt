@@ -1,6 +1,7 @@
-package tk.vhhg.rooms
+package tk.vhhg.rooms.model
 
 import kotlinx.serialization.Serializable
+import tk.vhhg.rooms.model.PieceOfHistory
 
 @Serializable
 data class DeviceDto(
@@ -9,5 +10,6 @@ data class DeviceDto(
     val type: String,
     val roomId: Long,
     val historicData: List<PieceOfHistory>?,
-    val topic: String
+    val topic: String,
+    val maxPower: Float
 )

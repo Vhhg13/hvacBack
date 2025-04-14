@@ -19,7 +19,12 @@ dependencies {
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.core)
+
+    implementation(libs.ktor.websockets)
+
     implementation(project(":tables"))
+    implementation(project(":autocontrol"))
+
     testImplementation(libs.ktor.serialization.kotlinx.json)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test.host)

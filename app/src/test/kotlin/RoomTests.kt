@@ -22,8 +22,8 @@ import io.ktor.server.testing.testApplication
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import tk.vhhg.rooms.RoomDto
-import tk.vhhg.rooms.TemperatureRegime
+import tk.vhhg.rooms.model.RoomDto
+import tk.vhhg.rooms.model.TemperatureRegime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

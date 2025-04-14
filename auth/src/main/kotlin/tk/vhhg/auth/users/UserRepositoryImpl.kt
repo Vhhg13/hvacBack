@@ -106,7 +106,11 @@ class UserRepositoryImpl(val tokenConfig: TokenConfig) : UserRepository {
 
     private suspend fun <T> dbQuery(block: suspend () -> T): T = newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    private fun createTokenPair(userId: Int, refreshId: Int, refresh: String): TokenPair {
+    private fun createTokenPair(
+        userId: Int,
+        refreshId: Int,
+        refresh: String
+    ): TokenPair {
         val access = JWT.create()
             .withAudience(tokenConfig.jwtAudience)
             .withIssuer(tokenConfig.jwtDomain)

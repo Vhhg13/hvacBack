@@ -1,5 +1,6 @@
 package tk.vhhg
 
+import autocontrolModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.core.qualifier.qualifier
@@ -31,6 +32,6 @@ fun Application.configureDI() {
         single(qualifier("broker")) { environment.config.property("broker").getString() }
     }
     install(Koin) {
-        modules(authModule, roomsModule, appModule)
+        modules(authModule, roomsModule, appModule, autocontrolModule)
     }
 }

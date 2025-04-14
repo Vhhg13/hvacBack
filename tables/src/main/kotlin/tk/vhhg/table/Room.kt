@@ -1,9 +1,10 @@
 package tk.vhhg.table
 
 import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.ReferenceOption
 
 object Room : LongIdTable("room") {
-    val ownerId = reference("user", Users)
+    val ownerId = reference("user", Users, onDelete = ReferenceOption.CASCADE)
     val name = varchar("name", 255)
     val scriptCode = text("script_code")
     val volume = float("volume")
