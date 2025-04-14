@@ -1,5 +1,6 @@
 package tk.vhhg.rooms.repo
 
+import kotlinx.coroutines.flow.StateFlow
 import tk.vhhg.rooms.model.DeviceDto
 
 interface DeviceRepository {
@@ -8,6 +9,6 @@ interface DeviceRepository {
     suspend fun deleteDevice(userId: Int, deviceId: Long): Boolean
     suspend fun setDeviceValue(userId: Int, roomId: Long, deviceId: Long, value: Float): Boolean
     suspend fun getCurrentDeviceData(userId: Int, roomId: Long, deviceId: Long, fromMillis: Long?, toMillis: Long?): DeviceDto?
-    suspend fun getTopicFor(deviceId: Long): String?
-//    suspend fun getSubscription(userId: Int, roomId: Long, deviceId: Long): StateFlow<String>?
+//    suspend fun getTopicFor(deviceId: Long): String?
+    suspend fun getSubscription(userId: Int, roomId: Long, deviceId: Long): StateFlow<String>?
 }

@@ -1,6 +1,5 @@
 package tk.vhhg.rooms.repo
 
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.float
@@ -9,8 +8,6 @@ import kotlinx.serialization.json.long
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import tk.vhhg.autocontrol.heatcool.HeatCoolDevice
-import tk.vhhg.autocontrol.heatcool.HeaterCooler
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.rooms.model.RoomDto
 import tk.vhhg.table.Device
@@ -19,7 +16,7 @@ import tk.vhhg.table.Users
 
 class RoomsRepositoryImpl(
 //    private val scriptExecutor: ScriptExecutor,
-    private val heaterCooler: HeaterCooler
+//    private val heaterCooler: HeaterCooler
 ) : RoomsRepository {
 
     override suspend fun getRoomsForUser(userId: Int): List<RoomDto> = dbQuery {
@@ -96,24 +93,24 @@ class RoomsRepositoryImpl(
             it[targetTemp] = target
             it[Room.deadline] = deadline
         }
-        val devices = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
-            .select(Device.topic, Device.maxPower, Device.type, Device.ownerId)
-            .where { (Room.id eq roomId) and (Device.id.isNotNull()) }
-            .orderBy(Device.type to SortOrder.DESC_NULLS_LAST, Device.id to SortOrder.ASC_NULLS_LAST)
-            .map {
-                HeatCoolDevice(
-                    topic = it[Device.topic],
-                    type = it[Device.type],
-                    maxPower = it[Device.maxPower].toDouble()
-                )
-            }
-        heaterCooler.start(
-            roomId = roomId,
-            volume = TODO(),
-            target = target,
-            deadline = deadline,
-            devices = devices
-        )
+//        val devices = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
+//            .select(Device.topic, Device.maxPower, Device.type, Device.ownerId)
+//            .where { (Room.id eq roomId) and (Device.id.isNotNull()) }
+//            .orderBy(Device.type to SortOrder.DESC_NULLS_LAST, Device.id to SortOrder.ASC_NULLS_LAST)
+//            .map {
+//                HeatCoolDevice(
+//                    topic = it[Device.topic],
+//                    type = it[Device.type],
+//                    maxPower = it[Device.maxPower].toDouble()
+//                )
+//            }
+//        heaterCooler.start(
+//            roomId = roomId,
+//            volume = TODO(),
+//            target = target,
+//            deadline = deadline,
+//            devices = devices
+//        )
 
         count == 1
     }

@@ -17,10 +17,10 @@ val roomsModule = module {
 //    }
 
     single<RoomsRepository> {
-        RoomsRepositoryImpl(get())
+        RoomsRepositoryImpl()
     }
 
     single<DeviceRepository> {
-        DeviceRepositoryImpl(get(), get())
+        DeviceRepositoryImpl(get())
     }
 }

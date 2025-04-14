@@ -1,6 +1,5 @@
 package tk.vhhg
 
-import autocontrolModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.core.qualifier.qualifier
@@ -10,6 +9,7 @@ import tk.vhhg.auth.authModule
 import tk.vhhg.auth.model.TokenConfig
 import tk.vhhg.auth.users.UserRepository
 import tk.vhhg.auth.users.UserRepositoryImpl
+import tk.vhhg.autocontrol.autocontrolModule
 import tk.vhhg.rooms.roomsModule
 
 fun Application.configureDI() {

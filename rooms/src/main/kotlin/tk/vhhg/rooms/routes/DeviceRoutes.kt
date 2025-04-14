@@ -15,6 +15,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.ktor.ext.inject
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.rooms.repo.DeviceRepository
@@ -143,14 +144,13 @@ fun Route.deviceRoutes() {
             call.respond(HttpStatusCode.NotFound, "No deviceId provided")
             return@webSocket
         }
-//        val stateFlow: StateFlow<String>? = deviceRepo.getSubscription(userId, roomId, deviceId)
-//        if (stateFlow == null) {
-//            call.respond(HttpStatusCode.NotFound, "Room or device not found by id")
-//            return@webSocket
-//        }
-        val topic = deviceRepo.getTopicFor(deviceId)
+        val stateFlow: StateFlow<String>? = deviceRepo.getSubscription(userId, roomId, deviceId)
+        if (stateFlow == null) {
+            call.respond(HttpStatusCode.NotFound, "Room or device not found by id")
+            return@webSocket
+        }
+//        val topic = deviceRepo.getTopicFor(deviceId)
         try {
-
             stateFlow.collect { value ->
                 val frame = Frame.Text(value)
                 outgoing.send(frame)
