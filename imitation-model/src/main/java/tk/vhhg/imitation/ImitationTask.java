@@ -78,6 +78,7 @@ class ImitationTask implements Runnable {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        if (!Double.isFinite(newTemp)) return;
         temperature.set(Float.floatToIntBits(newTemp));
 //        System.out.println("set");
         try {
