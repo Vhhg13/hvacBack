@@ -41,7 +41,6 @@ class Broker private constructor(url: String) {
         mqttClient.subscribe(topic, 2) { topic: String, message ->
             val msg = String(message.payload)
             stateFlow.value = msg
-            println("broker received $msg")
         }
 //        val stateFlow = callbackFlow {
 //
@@ -77,7 +76,6 @@ class Broker private constructor(url: String) {
     operator fun get(topic: String): String = subscribe(topic).value
 
     operator fun set(topic: String, value: String) {
-        println("published $value to $topic")
-        mqttClient.publish(topic, value.toByteArray(), 2, true)
+        mqttClient.publish(topic, value.toByteArray(), 2, false)
     }
 }

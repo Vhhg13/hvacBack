@@ -6,6 +6,7 @@ import org.koin.core.qualifier.qualifier
 import org.koin.core.qualifier.qualifier
 import org.koin.dsl.module
 import tk.vhhg.autocontrol.Broker
+import tk.vhhg.autocontrol.heatcool.HeaterCooler
 import tk.vhhg.table.Device
 import tk.vhhg.table.Room
 import java.util.concurrent.ConcurrentHashMap
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 val autocontrolModule = module {
 //    val roomsLockQualifier = qualifier("roomsLock")
 //    single<Map<Long, Boolean>>(roomsLockQualifier) { ConcurrentHashMap<Long, Boolean>() }
-//    single { HeaterCooler(get()) }
+    single { HeaterCooler(get()) }
     single { Broker.instance(get(qualifier("broker"))) }
 //    single<ScriptExecutor> {
 //        val se = ScriptExecutor(get(), get<Map<Long, Boolean>>(roomsLockQualifier))

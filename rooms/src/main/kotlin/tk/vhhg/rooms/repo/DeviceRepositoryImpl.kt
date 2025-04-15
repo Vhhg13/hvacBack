@@ -5,12 +5,14 @@ import kotlinx.coroutines.flow.StateFlow
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import tk.vhhg.autocontrol.Broker
+import tk.vhhg.autocontrol.heatcool.HeaterCooler
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.table.Device
 import tk.vhhg.table.Users
 
 class DeviceRepositoryImpl(
-    private val broker: Broker
+    private val broker: Broker,
+    private val heaterCooler: HeaterCooler
 ) : DeviceRepository {
     override suspend fun createDevice(userId: Int, deviceDto: DeviceDto): DeviceDto? = dbQuery {
         if (!userExists(userId)) return@dbQuery null
@@ -85,7 +87,8 @@ class DeviceRepositoryImpl(
 //                    maxPower = it[Device.maxPower].toDouble()
 //                )
 //            }
-//        heaterCooler.start(roomId, TODO(), null, null, devices)
+//        heaterCooler.start(roomId, , null, null, devices)
+        heaterCooler.cancel(roomId)
         val topic = Device.select(Device.topic)
             .where { (Device.id eq deviceId) and (Device.roomId eq roomId) and (Device.ownerId eq userId) }
             .singleOrNull()?.get(Device.topic)

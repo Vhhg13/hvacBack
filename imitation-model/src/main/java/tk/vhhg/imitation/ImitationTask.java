@@ -82,7 +82,6 @@ class ImitationTask implements Runnable {
 //        System.out.println("set");
         try {
             client.publish(params.thermostat, String.valueOf(newTemp).getBytes(), 2, true);
-            System.out.println("Published " + newTemp + " to " + params.thermostat);
         } catch (MqttException e) {
             throw new RuntimeException(e);
         }
