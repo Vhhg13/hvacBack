@@ -6,13 +6,15 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import tk.vhhg.autocontrol.Broker
 import tk.vhhg.autocontrol.heatcool.HeaterCooler
+import tk.vhhg.autocontrol.scripting.ScriptExecutor
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.table.Device
 import tk.vhhg.table.Users
 
 class DeviceRepositoryImpl(
     private val broker: Broker,
-    private val heaterCooler: HeaterCooler
+    private val heaterCooler: HeaterCooler,
+    private val scriptExecutor: ScriptExecutor
 ) : DeviceRepository {
     override suspend fun createDevice(userId: Int, deviceDto: DeviceDto): DeviceDto? = dbQuery {
         if (!userExists(userId)) return@dbQuery null
@@ -24,6 +26,7 @@ class DeviceRepositoryImpl(
             it[roomId] = deviceDto.roomId
             it[name] = deviceDto.name
         }.value
+        scriptExecutor.runAll()
 //        val q = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
 //            .select(Room.id, Room.scriptCode, Device.topic, Device.id)
 //            .orderBy(Device.id)
@@ -47,6 +50,7 @@ class DeviceRepositoryImpl(
             it[topic] = deviceDto.topic
             it[maxPower] = deviceDto.maxPower
         }
+        scriptExecutor.runAll()
 //        val q = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
 //            .select(Room.id, Room.scriptCode, Device.topic, Device.id)
 //            .orderBy(Device.id)
@@ -66,6 +70,7 @@ class DeviceRepositoryImpl(
         broker[removedRow[Device.topic]] = "0"
         broker.unsubscribe(removedRow[Device.topic])
         //scriptExecutor.removeTopic(removedRow[Device.roomId].value, removedRow[Device.topic])
+        scriptExecutor.runAll()
         true
     }
 

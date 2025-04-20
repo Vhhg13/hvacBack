@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import tk.vhhg.autocontrol.heatcool.HeatCoolDevice
 import tk.vhhg.autocontrol.heatcool.HeaterCooler
+import tk.vhhg.autocontrol.scripting.ScriptExecutor
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.rooms.model.RoomDto
 import tk.vhhg.table.Device
@@ -17,7 +18,7 @@ import tk.vhhg.table.Room
 import tk.vhhg.table.Users
 
 class RoomsRepositoryImpl(
-//    private val scriptExecutor: ScriptExecutor,
+    private val scriptExecutor: ScriptExecutor,
     private val heaterCooler: HeaterCooler
 ) : RoomsRepository {
 
@@ -36,13 +37,14 @@ class RoomsRepositoryImpl(
             it[volume] = room.volume
             it[scriptCode] = ""
         }.value
-//        scriptExecutor.updateScript(roomId, "")
+        scriptExecutor.runAll()
         roomId
     }
 
     override suspend fun deleteRoom(userId: Int, roomId: Long): Boolean = dbQuery {
         if (!userExists(userId)) return@dbQuery false
-        //scriptExecutor.remove(roomId)
+        //scriptExecutor.runAll()
+        scriptExecutor.remove(roomId)
         Room.deleteWhere { id eq roomId } == 1
     }
 
@@ -56,9 +58,9 @@ class RoomsRepositoryImpl(
             patch["volume"]?.let { row[volume] = it.jsonPrimitive.float }
             patch["scriptCode"]?.let { row[scriptCode] = it.jsonPrimitive.content }
         }
-//        patch["scriptCode"]?.let {
-//            if (roomId != null) scriptExecutor.updateScript(roomId, it.jsonPrimitive.content)
-//        }
+        patch["scriptCode"]?.let {
+            if (roomId != null) scriptExecutor.runAll()
+        }
         rowsAffected == 1
     }
 
