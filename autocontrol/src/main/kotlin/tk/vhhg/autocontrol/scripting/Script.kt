@@ -5,7 +5,16 @@ data class Script(
     val topics: List<String>,
     val code: String,
 ) {
-    val wrappedCode: String get() = "{ List topics -> $code }"
+    val wrappedCode: String get() = """
+        import org.jetbrains.annotations.NotNull
+        import tk.vhhg.autocontrol.scripting.NotifyingScript
+        new NotifyingScript(x, y) {
+            @Override
+            List<Double> run(@NotNull List<Double> topics) {
+                $code
+            }
+        }
+        """.trimIndent()
 
     override fun toString(): String {
         return "${super.toString()} topics=${topics} wrappedCode=$wrappedCode}"

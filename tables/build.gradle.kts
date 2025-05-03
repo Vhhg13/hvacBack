@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "tk.vhhg"
@@ -11,9 +10,9 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.postgresql)
+    api(libs.exposed.core)
+    api(libs.exposed.jdbc)
+    api(libs.postgresql)
     testImplementation(kotlin("test"))
 }
 

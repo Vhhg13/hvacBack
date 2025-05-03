@@ -8,8 +8,7 @@ import java.util.Random;
 import java.util.concurrent.*;
 
 public class Imitator {
-    private final ScheduledExecutorService executorService =
-            Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
+    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
 
     private final String brokerUrl;
 

@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.StateFlow
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import tk.vhhg.autocontrol.Broker
-import tk.vhhg.autocontrol.heatcool.HeaterCooler
 import tk.vhhg.autocontrol.scripting.ScriptExecutor
 import tk.vhhg.rooms.model.DeviceDto
 import tk.vhhg.table.Device
@@ -13,7 +12,7 @@ import tk.vhhg.table.Users
 
 class DeviceRepositoryImpl(
     private val broker: Broker,
-    private val heaterCooler: HeaterCooler,
+    private val roomRepo: RoomsRepository,
     private val scriptExecutor: ScriptExecutor
 ) : DeviceRepository {
     override suspend fun createDevice(userId: Int, deviceDto: DeviceDto): DeviceDto? = dbQuery {
@@ -27,16 +26,6 @@ class DeviceRepositoryImpl(
             it[name] = deviceDto.name
         }.value
         scriptExecutor.runAll()
-//        val q = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
-//            .select(Room.id, Room.scriptCode, Device.topic, Device.id)
-//            .orderBy(Device.id)
-//            .groupBy(
-//                keySelector = {
-//                    it[Room.id].value to it[Room.scriptCode]
-//                },
-//                valueTransform = { it.getOrNull(Device.topic) }
-//            )
-        //scriptExecutor.scheduleAll(q)
         deviceDto.copy(id = id)
     }
 
@@ -51,16 +40,6 @@ class DeviceRepositoryImpl(
             it[maxPower] = deviceDto.maxPower
         }
         scriptExecutor.runAll()
-//        val q = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
-//            .select(Room.id, Room.scriptCode, Device.topic, Device.id)
-//            .orderBy(Device.id)
-//            .groupBy(
-//                keySelector = {
-//                    it[Room.id].value to it[Room.scriptCode]
-//                },
-//                valueTransform = { it.getOrNull(Device.topic) }
-//            )
-//        scriptExecutor.scheduleAll(q)
         true
     }
 
@@ -81,19 +60,7 @@ class DeviceRepositoryImpl(
         value: Float
     ): Boolean = dbQuery {
         if (!userExists(userId)) return@dbQuery false
-//        val devices = Device.join(Room, JoinType.FULL, Device.roomId, Room.id)
-//            .select(Device.topic, Device.maxPower, Device.type, Device.ownerId)
-//            .where { (Room.id eq roomId) and (Device.id.isNotNull()) }
-//            .orderBy(Device.type to SortOrder.DESC_NULLS_LAST, Device.id to SortOrder.ASC_NULLS_LAST)
-//            .map {
-//                HeatCoolDevice(
-//                    topic = it[Device.topic],
-//                    type = it[Device.type],
-//                    maxPower = it[Device.maxPower].toDouble()
-//                )
-//            }
-//        heaterCooler.start(roomId, , null, null, devices)
-        heaterCooler.cancel(roomId)
+        roomRepo.setTemperatureRegime(userId, roomId, null, null)
         val topic = Device.select(Device.topic)
             .where { (Device.id eq deviceId) and (Device.roomId eq roomId) and (Device.ownerId eq userId) }
             .singleOrNull()?.get(Device.topic)
@@ -124,10 +91,6 @@ class DeviceRepositoryImpl(
             )
         }
     }
-
-//    override suspend fun getTopicFor(deviceId: Long): String? = dbQuery {
-//        Device.select(Device.topic).where { Device.id eq deviceId }.singleOrNull()?.get(Device.topic)
-//    }
 
     override suspend fun getSubscription(
         userId: Int,

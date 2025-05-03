@@ -1,7 +1,6 @@
 package tk.vhhg.autocontrol.scripting
 
-import groovy.lang.Closure
-import groovy.lang.GroovyShell
+import groovy.util.Eval
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -12,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 
 class ScriptExecutor(private val broker: Broker, private val lockedRooms: ConcurrentHashMap<Long, Boolean>) {
-
-    private val groovyShell = GroovyShell()
 
     companion object {
         const val DELAY = 1000L
@@ -28,12 +25,13 @@ class ScriptExecutor(private val broker: Broker, private val lockedRooms: Concur
                 broker.subscribe(it)
             }
             delay(DELAY + Random.nextLong(0, DELAY))
+            val ns = Eval.xy(script.roomId, broker, script.wrappedCode) as NotifyingScript
             while (true) {
                 delay(DELAY)
                 val topicValues = script.topics.map { topicName ->
                     broker[topicName]
                 }.map { it.toDoubleOrNull() ?: 0.0 }
-                val results = script.run(topicValues)
+                val results = script.run(ns, topicValues)
                 ensureActive()
                 if (lockedRooms[script.roomId] == true) continue
                 for (i in script.topics.indices) {
@@ -57,14 +55,9 @@ class ScriptExecutor(private val broker: Broker, private val lockedRooms: Concur
         scheduledScripts.remove(roomId)?.second?.cancel()
     }
 
-    fun Script.run(topicValues: List<Double>): List<String?> {
+    fun Script.run(ns: NotifyingScript, topicValues: List<Double>): List<String?> {
         if (code.isBlank()) return emptyList()
-        val f = groovyShell.evaluate(wrappedCode) as? Closure<*>
-        if (f == null) {
-            scheduledScripts[roomId]?.second?.cancel()
-            return emptyList()
-        }
-        return (f.call(topicValues) as List<*>).map { it?.toString() }
+        return ns.runWithState(topicValues).map { it?.toString() }
     }
 
     fun scheduleAll(q: Map<Pair<Long, String>, List<String?>>) {

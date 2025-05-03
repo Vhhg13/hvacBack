@@ -1,7 +1,6 @@
 plugins {
     kotlin("jvm")
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 

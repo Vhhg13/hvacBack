@@ -1,6 +1,5 @@
 [versions]
 exposed-version = "0.59.0"
-h2-version = "2.3.232"
 kotlin-version = "2.1.10"
 ktor-version = "2.3.13"
 logback-version = "1.4.14"
@@ -8,8 +7,10 @@ postgres-version = "42.7.5"
 koin-version = "4.0.2"
 bcrypt-version = "0.10.2"
 paho = "1.2.5"
-result-monad = "2.0.1"
 kotlin-coroutines = "1.10.1"
+firebase-admin = "9.4.3"
+groovy = "3.0.23"
+commons-math = "3.6.1"
 
 [libraries]
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor-version" }
@@ -18,7 +19,6 @@ ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor-ve
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor-version" }
 ktor-server-auth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor-version" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgres-version" }
-h2 = { module = "com.h2database:h2", version.ref = "h2-version" }
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
 exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
 ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor-version" }
@@ -31,10 +31,11 @@ kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version
 ktor-koin = { module = "io.insert-koin:koin-ktor", version.ref = "koin-version" }
 bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt-version" }
 paho = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho" }
-result-monad = { module = "com.michael-bull.kotlin-result:kotlin-result", version.ref = "result-monad" }
-result-monad-coroutines = { module = "com.michael-bull.kotlin-result:kotlin-result-coroutines", version.ref = "result-monad" }
 kotlin-coroutines = {module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 ktor-websockets = {module = "io.ktor:ktor-server-websockets", version.ref = "ktor-version" }
+firebase-admin = { module = "com.google.firebase:firebase-admin", version.ref = "firebase-admin"}
+groovy = { module = "org.codehaus.groovy:groovy-all", version.ref = "groovy" }
+apache-commons-math = { module = "org.apache.commons:commons-math3", version.ref = "commons-math" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }

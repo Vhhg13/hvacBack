@@ -8,11 +8,6 @@ class HeaterCooler(private val broker: Broker, private val roomsLock: Concurrent
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val tasks = ConcurrentHashMap<Long, Job>()
 
-    fun cancel(roomId: Long) {
-        tasks[roomId]?.cancel()
-        unlock(roomId)
-    }
-
     fun start(roomId: Long, volume: Float, target: Float?, deadline: Long?, devices: List<HeatCoolDevice>) {
         lock(roomId)
         tasks[roomId]?.cancel()

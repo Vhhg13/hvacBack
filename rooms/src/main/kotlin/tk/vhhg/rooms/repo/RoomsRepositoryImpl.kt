@@ -45,6 +45,7 @@ class RoomsRepositoryImpl(
         if (!userExists(userId)) return@dbQuery false
         //scriptExecutor.runAll()
         scriptExecutor.remove(roomId)
+        setTemperatureRegime(userId, roomId, null, null)
         Room.deleteWhere { id eq roomId } == 1
     }
 

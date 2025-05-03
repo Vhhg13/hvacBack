@@ -20,19 +20,25 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.firebase.admin)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.auth)
-    implementation(libs.postgresql)
-    implementation(libs.h2)
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.jdbc)
     implementation(libs.ktor.server.call.logging)
     implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
+    implementation(libs.ktor.koin)
+    implementation(project(":auth"))
+    implementation(project(":tables"))
+    implementation(project(":rooms"))
+    implementation(project(":imitation-model"))
+    implementation(project(":autocontrol"))
+    implementation(project(":pushfcm"))
+
+
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.client.content.negotiation)
@@ -41,16 +47,8 @@ dependencies {
     testImplementation(libs.ktor.serialization.kotlinx.json)
     testImplementation("io.ktor:ktor-client-logging:2.3.13")
     testImplementation(libs.paho)
-
-    implementation(libs.ktor.koin)
-    implementation("io.insert-koin:koin-ktor:4.0.2")
-
-    implementation(project(":auth"))
-    implementation(project(":tables"))
-    implementation(project(":rooms"))
-    implementation(project(":imitation-model"))
-    implementation(project(":autocontrol"))
 }
+
 kotlin {
     jvmToolchain(23)
 }
