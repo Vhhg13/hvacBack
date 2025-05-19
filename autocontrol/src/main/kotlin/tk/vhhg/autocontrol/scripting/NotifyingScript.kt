@@ -6,7 +6,7 @@ abstract class NotifyingScript(private val roomId: Long,
                                private val broker: Broker) {
     private val notificationsInOneRun = mutableListOf<Boolean>()
     private var notificationIndex = 0
-    abstract fun run(topics: List<Double>): List<Number?>
+    abstract fun run(devices: List<Double>): List<Number?>
     fun runWithState(topics: List<Double>): List<Double?> {
         notificationIndex = 0
         return run(topics).map { it?.toDouble() }

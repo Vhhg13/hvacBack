@@ -10,7 +10,7 @@ data class Script(
         import tk.vhhg.autocontrol.scripting.NotifyingScript
         new NotifyingScript(x, y) {
             @Override
-            List<Double> run(@NotNull List<Double> topics) {
+            List<Double> run(@NotNull List<Double> devices) {
                 $code
             }
         }
