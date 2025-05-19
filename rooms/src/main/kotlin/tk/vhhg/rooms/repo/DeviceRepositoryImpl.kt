@@ -46,8 +46,11 @@ class DeviceRepositoryImpl(
     override suspend fun deleteDevice(userId: Int, deviceId: Long): Boolean = dbQuery {
         val removedRow = Device.deleteReturning(listOf(Device.roomId, Device.topic)) { Device.id eq deviceId }.singleOrNull()
         if (removedRow == null) return@dbQuery false
-        broker[removedRow[Device.topic]] = "0"
-        broker.unsubscribe(removedRow[Device.topic])
+        val topicName = removedRow[Device.topic]
+        val roomId = removedRow[Device.roomId].value
+        broker[topicName] = "0"
+        broker.unsubscribe(topicName)
+        roomRepo.setTemperatureRegime(userId, roomId, null, null)
         //scriptExecutor.removeTopic(removedRow[Device.roomId].value, removedRow[Device.topic])
         scriptExecutor.runAll()
         true
